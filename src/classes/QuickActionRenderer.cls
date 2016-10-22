@@ -165,7 +165,7 @@ public class QuickActionRenderer {
      * time of page load. Hence the only option was
      * a Form Post as URL Parameters will not suffice.
      */
-     @TestVisible
+    @TestVisible
     private void processRequestHeaders() {
         String metadataJSON = ApexPages.currentPage().getParameters().get( 'metadata' );
         String parentId     = ApexPages.currentPage().getParameters().get( 'parentId' );
@@ -224,7 +224,7 @@ public class QuickActionRenderer {
                 }
                 
                 /**
-                 * Ad mentioned before, a QuickAction
+                 * As mentioned before, a QuickAction
                  * can only be either "Create" or
                  * "VF Page". But we are utilizing the
                  * "Create" Action Layout to also
@@ -263,7 +263,7 @@ public class QuickActionRenderer {
                 /**
                  * Set the "oddNumberOfFields" to
                  * TRUE. This is used in the VF Page
-                 * yo determined if the field in the
+                 * to determine if the field in the
                  * last row needs to be in full width
                  * or not as if it's odd it will not
                  * have a partner on the right hand side
