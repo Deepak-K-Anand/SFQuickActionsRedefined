@@ -26,7 +26,7 @@
  * tags to render out a layout that would closely
  * resemble the actual QuickAction.
  *
- * @author  	Talent Rover Inc.
+ * @author  	Deepak K Anand
  * @version  	1.0
  */
 public class QuickActionRenderer {
