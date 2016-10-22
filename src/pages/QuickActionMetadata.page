@@ -1,0 +1,38 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+    <html lang="en" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <title>Quick Action - Talent Rover</title>
+            
+            <apex:stylesheet value="{!URLFOR($Resource.SLDS104, '/assets/styles/salesforce-lightning-design-system-vf.min.css')}" />
+            <apex:stylesheet value="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+            <apex:stylesheet value="{!$Resource.QuickActionMetadataCSS}" />
+        </head>
+        <body class="slds">
+            <!--Message-->
+            <div class="centered">
+                <div class="slds-text-heading--large">
+                    <i class="fa fa-cog fa-3x fa-spin fa-fw"></i><br/>
+                    <strong>Generating Layout. Please wait...</strong>
+                </div>
+            </div>
+            
+            <!--Form to Post Metadata, Entity Id, Parent Id and Container flag to Renderer-->
+            <form id="frmRenderer" action="{!$Page.QuickActionRenderer}" method="POST">
+                <input id="hdnMetaData"     name="metadata"     type="hidden" />
+                <input id="hdnParentId"     name="parentId"     type="hidden" />
+                <input id="hdnEntityId"     name="entityId"     type="hidden" />
+                <input id="hdnContainer"    name="container"    type="hidden" />
+            </form>
+            
+            <script type="text/javascript" src="/soap/ajax/37.0/connection.js"></script>
+            <script type="text/javascript" src="{!$Resource.QuickActionMetadataJS}"></script>
+            <script type="text/javascript">
+                QuickActionMetadata.init( "{!GETSESSIONID()}" );
+            </script>
+        </body>
+    </html>
+</apex:page>

@@ -1,0 +1,139 @@
+<apex:page controller="QuickActionRenderer" showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+    <html lang="en" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <title>Quick Action - Talent Rover</title>
+            
+            <!--These should be on the top for a reason-->
+            <apex:stylesheet value="{!URLFOR($Resource.Pace,'flash.css')}" />
+            <script type="text/javascript" src="{!URLFOR($Resource.Pace,'pace.min.js')}"></script>
+            
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+            <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+            
+            <apex:stylesheet value="{!URLFOR($Resource.SLDS104, '/assets/styles/salesforce-lightning-design-system-vf.min.css')}" />
+            <apex:stylesheet value="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+            <apex:stylesheet value="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+            <apex:stylesheet value="{!$Resource.QuickActionRendererCSS}" />
+        </head>
+        <body class="slds">
+            <!--Render the VF Page if the Quick Action is of type "VisualforcePage"-->
+            <apex:iframe src="{!metadata.visualforcePageUrl}" rendered="{!isMetadataAvailable && mode == 'VF Page'}" />
+            
+            <!--Build the Form if the Quick Action is of type "Create/LogACall/Update"-->
+            <apex:form styleClass="slds-m-around--medium" rendered="{!isMetadataAvailable && mode != 'VF Page' && showContainer}">
+                <article class="slds-card">
+                    <!--Card Header-->
+                    <header class="slds-card__header slds-grid">
+                        <div class="slds-media slds-media--center slds-has-flexi-truncate">
+                            <div class="slds-media__figure">
+                                <!--Display the image as configured on the Quick Action-->
+                                <apex:image value="{!metadata.iconUrl}" styleClass="slds-icon slds-icon--small" rendered="{!NOT(ISBLANK(metadata.iconUrl))}"/>
+                            </div>
+                            <div class="slds-media__body slds-truncate">
+                                <h2>
+                                    <!--Display the title as configured on the Quick Action-->
+                                    <span class="slds-text-heading--medium">{!metadata.label}</span>
+                                </h2>
+                            </div>
+                        </div>
+                        <div class="slds-no-flex">
+                            <!--Button to Create/Update-->
+                            <apex:commandButton value="{!IF( mode == 'Create', metadata.label, 'Save')}" action="{!save}" styleClass="slds-button slds-button--brand slds-col--bump-left"></apex:commandButton>
+                        </div>
+                    </header>
+                    
+                    <!--Card Body-->
+                    <div class="slds-card__body slds-p-around--medium slds-scrollable--y">
+                        <!--Message to be displayed when the action was successful-->
+                        <apex:outputPanel rendered="{!hasCompleted && NOT(hasError)}">
+                            <div class="slds-box slds-theme--success">
+                                <i class="fa fa-check"></i> Record(s) have been created/updated successfully.
+                            </div>
+                        </apex:outputPanel>
+                        
+                        <!--Message to be displayed when the action has failed-->
+                        <apex:outputPanel rendered="{!hasCompleted && hasError}">
+                            <div class="slds-box slds-theme--error">
+                                <i class="fa fa-times"></i> {!errorMessage}
+                            </div>
+                        </apex:outputPanel>
+                        
+                        <div class="slds-grid slds-wrap">
+                            <apex:repeat value="{!metadata.fields}" var="field">
+                                <div class="slds-col slds-size--6-of-12">
+                                    <div class="slds-form-element slds-m-around--medium">
+                                        <label class="slds-form-element__label">{!field.label}</label>
+                                        <div class="slds-form-element__control">
+                                            <!--Input Field for the respective field on the Quick Action Layout-->
+                                            <apex:inputField value="{!anyObject[field.name]}" 
+                                                                rendered="{!IF(field.name <> metadata.targetParentField, TRUE, IF(field.name == metadata.targetParentField && parentIds.size > 0, FALSE, TRUE))}" 
+                                                                style="{!IF(oddNumberOfFields == TRUE && metadata.fields.size == field.index, 'width: 95%', '')}"/>
+                                            
+                                            <!--If we have multiple "parentIds" then we aren't letting the user specify the Parent Lookup-->
+                                            <apex:outputPanel rendered="{!IF(field.name == metadata.targetParentField && parentIds.size > 0, TRUE, FALSE)}">
+                                                <textarea disabled="true" class="slds-input slds-scrollable--y n-ids-message">You have supplied multiple records and hence will be saved automatically!</textarea>
+                                            </apex:outputPanel>
+                                        </div>
+                                    </div>
+                                </div>
+                            </apex:repeat>
+                        </div>
+                    </div>
+                </article>
+            </apex:form>
+            
+            <!--Build the Form(without header) if the Quick Action is of type "Create/LogACall/Update"-->
+            <apex:form styleClass="slds-m-around--medium" rendered="{!isMetadataAvailable && mode != 'VF Page' && NOT(showContainer)}">
+                <!--Message to be displayed when the action was successful-->
+                <apex:outputPanel rendered="{!hasCompleted && NOT(hasError)}">
+                    <script type="text/javascript">
+                        toastr.success( "Record(s) have been created/updated successfully." );
+                    </script>
+                </apex:outputPanel>
+                
+                <!--Message to be displayed when the action has failed-->
+                <apex:outputPanel rendered="{!hasCompleted && hasError}">
+                    <script type="text/javascript">
+                        toastr.error( "{!errorMessage}" );
+                    </script>
+                </apex:outputPanel>
+
+                <!--Header-->
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-medium-size--4-of-12 slds-p-around--medium">
+                        <h3 class="slds-text-heading--small slds-m-bottom--large slds-section__title">Details</h3>
+                    </div>
+                    <div class="slds-col slds-medium-size--8-of-12 slds-p-around--medium">
+                        <apex:commandButton value="{!IF( mode == 'Create', metadata.label, 'Save')}" action="{!save}" styleClass="slds-button slds-button--brand slds-float--right"></apex:commandButton>
+                    </div>
+                </div>
+
+                <!--Body-->
+                <div class="slds-grid slds-wrap">
+                    <apex:repeat value="{!metadata.fields}" var="field">
+                        <div class="slds-col slds-size--6-of-12">
+                            <div class="slds-form-element slds-m-around--medium">
+                                <label class="slds-form-element__label">{!field.label}</label>
+                                <div class="slds-form-element__control">
+                                    <!--Input Field for the respective field on the Quick Action Layout-->
+                                    <apex:inputField value="{!anyObject[field.name]}" 
+                                                        rendered="{!IF(field.name <> metadata.targetParentField, TRUE, IF(field.name == metadata.targetParentField && parentIds.size > 0, FALSE, TRUE))}" 
+                                                        style="{!IF(oddNumberOfFields == TRUE && metadata.fields.size == field.index, 'width: 95%', '')}"/>
+                                    
+                                    <!--If we have multiple "parentIds" then we aren't letting the user specify the Parent Lookup-->
+                                    <apex:outputPanel rendered="{!IF(field.name == metadata.targetParentField && parentIds.size > 0, TRUE, FALSE)}">
+                                        <textarea disabled="true" class="slds-input slds-scrollable--y n-ids-message">You have supplied multiple records and hence will be saved automatically!</textarea>
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:repeat>
+                </div>
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

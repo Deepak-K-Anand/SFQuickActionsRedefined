@@ -1,0 +1,116 @@
+<apex:page showHeader="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">
+    <html lang="en" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="x-ua-compatible" content="ie=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            
+            <title>Quick Action Demo - Talent Rover</title>
+            
+            <apex:stylesheet value="{!URLFOR($Resource.SLDS104, '/assets/styles/salesforce-lightning-design-system-vf.min.css')}" />
+        </head>
+        <body class="slds">
+            <div id="mdlQuickAction" role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" style="display: none" onclick="hideModal()">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header slds-modal__header--empty">
+                    </div>
+                    <div class="slds-modal__content">
+                        <iframe id="quickActionRenderer" src="" scrolling="yes" frameborder="no" style="height: 500px; width:640px" />
+                    </div>
+                </div>
+            </div>
+            <div id="mdlBDropQuickAction" class="slds-backdrop slds-backdrop--open" style="display: none"></div>
+            
+            <div class="slds-page-header slds-m-around--small slds-m-bottom--small" role="banner">
+                <div class="slds-media slds-media--center">
+                    <div class="slds-media__body">
+                        <p class="slds-page-header__title slds-truncate slds-align-middle slds-text-heading--large">
+                            <strong>Quick Action Re-defined</strong>
+                        </p>
+                        <p class="slds-text-body--large page-header__info">
+                            <em>Just thinking out of the box!</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slds-form--horizontal slds-m-around--medium slds-m-right--x-large">
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Object</label>
+                    <div class="slds-form-element__control">
+                        <input id="txtObject" class="slds-input" type="text"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Action</label>
+                    <div class="slds-form-element__control">
+                        <input id="txtAction" class="slds-input" type="text"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Parent Id(s)</label>
+                    <div class="slds-form-element__control">
+                        <input id="txtParentId" class="slds-input" type="text"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Entity Id</label>
+                    <div class="slds-form-element__control">
+                        <input id="txtEntityId" class="slds-input" type="text"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Show Container</label>
+                    <div class="slds-form-element__control">
+                        <input id="txtShowCont" class="slds-input" type="text" value="1"/>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <label class="slds-form-element__label">Url</label>
+                    <div class="slds-form-element__control">
+                        <a id="anchURL" href="about:blank" target="_blank">n/A</a>
+                    </div>
+                </div>
+                <div class="slds-form-element slds-m-bottom--large">
+                    <button class="slds-button slds-button--brand" onclick="openQuickAction()">Open Quick Action</button>
+                </div>
+            </div>
+            
+            <script type="text/javascript">
+                function showModal() {
+                    document.getElementById( "mdlBDropQuickAction" ).style.display = "";
+                    document.getElementById( "mdlQuickAction" ).style.display = "";
+                }
+                
+                function hideModal() {
+                    document.getElementById( "quickActionRenderer" ).src = "";
+                    
+                    document.getElementById( "mdlBDropQuickAction" ).style.display = "none";
+                    document.getElementById( "mdlQuickAction" ).style.display = "none";
+                }
+                
+                function openQuickAction() {
+                    var object = document.getElementById( "txtObject" ).value;
+                    var action = document.getElementById( "txtAction" ).value;
+                    var parentId = document.getElementById( "txtParentId" ).value;
+                    var entityId = document.getElementById( "txtEntityId" ).value;
+                    var showContainer = document.getElementById( "txtShowCont" ).value;
+                    
+                    var url = 
+                        "{!$Page.QuickActionMetadata}?" + 
+                            "object="           + object    + 
+                            "&action="          + action    + 
+                            "&parentId="        + parentId  +
+                            "&entityId="        + entityId  +
+                            "&container="   + showContainer;
+                            
+                    document.getElementById( "anchURL" ).href = url;
+                    document.getElementById( "anchURL" ).innerHTML = url;                            
+                    document.getElementById( "quickActionRenderer" ).src = url;
+                    
+                    showModal();
+                }
+            </script>
+        </body>
+    </html>
+</apex:page>
